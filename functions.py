@@ -5,7 +5,11 @@ from time import sleep
 def limpar():
     system('cls')
 
+def espera():
+    sleep(1.5)
+
 def layout(title, lista_opcoes):
+    limpar()
     print(f"{' FUNCIONÁRIOS DA EMPRESA '.center(60, '-')}")
     print(f"\n{title.upper().center(60, '-')}\n")
     for i, opcao in enumerate(lista_opcoes):
@@ -14,15 +18,26 @@ def layout(title, lista_opcoes):
     print(f"{''.center(60, '-')}")
     
     opcao = input("\nOPCAO: ")
+    limpar()
     return opcao
 
 def layout_input(title, pergunta):
+    limpar()
     print(f"{' FUNCIONÁRIOS DA EMPRESA '.center(60, '-')}")
     print(f"\n{title.upper().center(60, '-')}\n")
 
-    opcao = input(f"\n{pergunta}")
+    opcao = input(f"\n{pergunta.upper()}")
+    limpar()
     return opcao
 
+
+def layout_mensagem(title, mensagem):
+    limpar()
+    print(f"{' FUNCIONÁRIOS DA EMPRESA '.center(60, '-')}")
+    print(f"\n{title.upper().center(60, '-')}\n")
+    print(f"\n{mensagem.upper()}")
+    espera()
+    limpar()
 
 def menu_opcoes():
     title = "MENU DE OPÇÕES"
@@ -45,22 +60,34 @@ UPDATE funcionario SET nome=?, salario=? WHERE id=?
 """
 
 def cadastrar_funcionario():
-    limpar()
-    title = "Cadastrar Funcionários"
-    lista_opcoes = [
-        "Adicionar dados"
-    ]
-
-    opcao = layout(title, lista_opcoes)
-
-    if opcao == "1":
-        con = ConnetionBD("empresa")
+    while True:
         limpar()
-        pergunta = "Digite o nome do funcionário: "
-        nome = layout_input(title, pergunta)
-        limpar()
-        pergunta = "Informe o salário do funcionário(opcional): "
-        salario = layout_input(title, pergunta)
+        title = "Cadastrar Funcionários"
+        lista_opcoes = [
+            "Adicionar dados"
+        ]
+        opcao = layout(title, lista_opcoes)
+
+        if opcao == "1":
+            con = ConnetionBD("empresa")
+            con.criar_tabela()
+
+            pergunta = "Digite o nome do funcionário: "
+            nome = layout_input(title, pergunta)
+            pergunta = "Informe o salário do funcionário(opcional): "
+            salario = layout_input(title, pergunta)
+
+            layout_mensagem(title, "INSERINDO...")
+
+            try:
+                query = "INSERT INTO funcionario (nome, salario) VALUES (?, ?)"
+                con.crud_operations(query, (nome, salario,))
+                layout_mensagem(title, "Valor inserido no banco de dados com sucesso!!!")
+            except:
+                layout_mensagem(title, "Ocorreu um erro ao inserir os dados no banco de dados!!!")
+        else:
+            erro = "Insira um valor existente!!!"
+            layout_mensagem(title, erro)
 
         
     
