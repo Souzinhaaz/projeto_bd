@@ -7,6 +7,12 @@ while True:
 
     if parametro == "1":
         functions.cadastrar_funcionario()
+    elif parametro == "2":
+        functions.editar_funcionario()
+    elif parametro == "3":
+        functions.excluir_funcionario()
+    elif parametro == "4":
+        functions.ordernar_registros()
     elif parametro == "0":
         print("Fim do programa!!!")
         break

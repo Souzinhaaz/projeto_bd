@@ -1,6 +1,6 @@
 import sqlite3
 
-class ConnetionBD():
+class ConnectionBD():
     def __init__(self, nome_arquivo):
         self.nome_bd = nome_arquivo
         self.conectar()

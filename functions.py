@@ -1,4 +1,4 @@
-from connection import ConnetionBD
+from connection import ConnectionBD
 from os import system
 from time import sleep
 
@@ -30,6 +30,22 @@ def layout_input(title, pergunta):
     limpar()
     return opcao
 
+def layout_input_tabela(title, funcionarios, pergunta):
+    print(f"{' FUNCIONÁRIOS DA EMPRESA '.center(60, '-')}")
+    print(f"\n{title.upper().center(60, '-')}\n")
+
+    id_width, name_width, salary_width = 3, 45, 12
+
+    print(f"{'ID':<{id_width}} {'Nome':<{name_width}} {'Salário':<{salary_width}}")
+    print("-" * (id_width + name_width + salary_width))
+
+    for item in funcionarios:
+        id, name, salary = item
+        print(f"{id:<{id_width}} {name:<{name_width}} {salary:<{salary_width}}")
+
+    opcao = input(f"\n{pergunta.upper()}")
+    limpar()
+    return opcao
 
 def layout_mensagem(title, mensagem):
     limpar()
@@ -38,6 +54,24 @@ def layout_mensagem(title, mensagem):
     print(f"\n{mensagem.upper()}")
     espera()
     limpar()
+
+def existe_id(id_funcionario, dados):
+    for item in dados:
+        if id_funcionario == item[0]:
+            return True
+    return False
+
+def inserir_no_banco(title, opcao, novo_dado, id):
+    con = ConnectionBD("empresa")
+    con.criar_tabela()
+
+    try:
+        query = f"UPDATE funcionario SET {opcao}=? WHERE id_matricula=?"
+        con.crud_operations(query, (novo_dado, id))
+        layout_mensagem(title, "Valor editado com sucesso!!!")
+    except:
+        layout_mensagem(title, "Ocorreu um erro ao editar o dado!!!")
+
 
 def menu_opcoes():
     title = "MENU DE OPÇÕES"
@@ -68,28 +102,116 @@ def cadastrar_funcionario():
         ]
         opcao = layout(title, lista_opcoes)
 
-        if opcao == "1":
-            con = ConnetionBD("empresa")
-            con.criar_tabela()
-
-            pergunta = "Digite o nome do funcionário: "
-            nome = layout_input(title, pergunta)
-            pergunta = "Informe o salário do funcionário(opcional): "
-            salario = layout_input(title, pergunta)
-
+        if opcao == "0":
+            break
+        elif opcao == "1":
+            nome = layout_input(title, "Digite o nome do funcionário: ")
+            salario = layout_input(title, "Informe o salário do funcionário(opcional): ")
             layout_mensagem(title, "INSERINDO...")
 
             try:
+                con = ConnectionBD("empresa")
+                con.criar_tabela()
                 query = "INSERT INTO funcionario (nome, salario) VALUES (?, ?)"
                 con.crud_operations(query, (nome, salario,))
                 layout_mensagem(title, "Valor inserido no banco de dados com sucesso!!!")
             except:
                 layout_mensagem(title, "Ocorreu um erro ao inserir os dados no banco de dados!!!")
+
         else:
             erro = "Insira um valor existente!!!"
             layout_mensagem(title, erro)
 
         
+def editar_funcionario():
+    while True:
+        limpar()
+        title = "Editar Funcionários"
+        try:
+            con = ConnectionBD("empresa")
+            con.criar_tabela()
+            funcionarios = con.ordenar("id_matricula")
+        except:
+            print("Erro ao conectar com o banco de dados!!!")
+
+        id_funcionario = layout_input_tabela(title, funcionarios, "Digite o id do funcionário que deseja editar. \n\n(pressione a tecla 0 para sair!): ")
+
+        if id_funcionario == "0":
+            break
+        else:
+            if existe_id(int(id_funcionario), funcionarios):
+                opcao = layout_input(title, "Oque você deseja editar? (nome, salario): ")
+
+                if opcao.lower() == "nome":
+                    novo_nome = layout_input(title, "Digite o novo nome: ")
+                    layout_mensagem(title, "EDITANDO...")
+                    inserir_no_banco(title, opcao, novo_nome, int(id_funcionario))
+                elif opcao.lower() == "salario":
+                    novo_salario = layout_input(title, "Digite o novo salário: ")
+                    layout_mensagem(title, "EDITANDO...")
+                    inserir_no_banco(title, opcao, float(novo_salario), int(id_funcionario))
+            else:
+                layout_mensagem(title, "Não existe o ID no banco de dados")
+
+def excluir_funcionario():
+    while True:
+        limpar()
+        title = "Excluir funcionários"
+        try:
+            con = ConnectionBD("empresa")
+            con.criar_tabela()
+            funcionarios = con.ordenar("id_matricula")
+        except:
+            print("Erro ao conectar com o banco de dados!!!")
+
+        id_funcionario = layout_input_tabela(title, funcionarios, "Digite o id do funcionário que deseja excluir. \n\n(pressione a tecla 0 para sair!): ")
+
+        if id_funcionario == "0":
+            break
+        else:
+            if existe_id(int(id_funcionario), funcionarios):
+                try: 
+                    layout_mensagem(title, "EXCLUINDO...")
+                    query = "DELETE FROM funcionario WHERE id_matricula = ?"
+                    con.crud_operations(query, (id_funcionario))
+                    layout_mensagem(title, "Valor excluido com sucesso!!!")
+                except:
+                    layout_mensagem(title, f"Ocorreu um erro ao tentar excluir o funcionário!!!")
+
+            else:
+                layout_mensagem(title, "Não existe o ID no banco de dados")
+
+def ordernar_registros():
+    while True:
+        limpar()
+        title = "Ordenar funcionários"
     
+        opcao = layout_input(title, "Como você deseja ordernar a tabela? [matricula, nome] \n\n(pressione a tecla 0 para sair!): ")
 
+        if opcao == "0":
+            break
+        else:
+            if opcao.lower() == "matricula" or opcao.lower() == "matrícula":
+                try:
+                    con = ConnectionBD("empresa")
+                    con.criar_tabela()
+                    funcionarios = con.ordenar("id_matricula")
+                except:
+                    print("Erro ao conectar com o banco de dados!!!")
 
+                pergunta = layout_input_tabela(title, funcionarios, "Deseja visualizar a tabela de outra forma?")
+                if pergunta[0].upper() == "N":
+                    break
+            
+            elif opcao.lower() == "nome":
+                try:
+                    con = ConnectionBD("empresa")
+                    con.criar_tabela()
+                    funcionarios = con.ordenar("nome")
+                except:
+                    print("Erro ao conectar com o banco de dados!!!")
+
+                pergunta = layout_input_tabela(title, funcionarios, "Deseja visualizar a tabela de outra forma?")
+                if pergunta[0].upper() == "N":
+                    break
+        
