@@ -215,3 +215,88 @@ def ordernar_registros():
                 if pergunta[0].upper() == "N":
                     break
         
+def pesquisar_funcionario():
+    while True:
+        limpar()
+        title = "Pesquisar Empregado"
+
+        opcao = layout_input(title, "Como você deseja pesquisar o empregado? [matricula, nome] \n\n(pressione a tecla 0 para sair!): ")
+
+        if opcao == "0":
+            break
+        else:
+            if opcao.lower() == "matricula" or opcao.lower() == "matrícula":
+                id = layout_input(title, "Informe o número de matrícula: ")
+                
+                try:
+                    con = ConnectionBD("empresa")
+                    con.criar_tabela()
+                    funcionarios = con.pesquisar_matricula(id)
+
+                    pergunta = layout_input_tabela(title, funcionarios, "Deseja fazer outra pesquisa? ")
+                    if pergunta[0].upper() == "N":
+                        break
+                except:
+                    print("Erro ao conectar com o banco de dados!!!")
+            
+            elif opcao.lower() == "nome":
+                nome = layout_input(title, "Informe o nome: ")
+
+                try:
+                    con = ConnectionBD("empresa")
+                    con.criar_tabela()
+                    funcionarios = con.pesquisar_nome(nome)
+
+                    pergunta = layout_input_tabela(title, funcionarios, "Deseja fazer outra pesquisa? ")
+                    if pergunta[0].upper() == "N":
+                        break
+                except:
+                    print("Erro ao conectar com o banco de dados!!!")
+
+def filtrar_funcionario():
+    while True:
+        limpar()
+        title = "Filtrar Funcionários"
+        lista_opcoes = [
+            "empregados que recebem salários acima de 1000.",
+            "empregados que recebem salários abaixo de 1000.",
+            "empregados que recebem salários iguais a 1000."
+        ]
+
+        opcao = layout(title, lista_opcoes)
+
+        if opcao == "0":
+            break
+        elif opcao == "1":
+            try:
+                con = ConnectionBD("empresa")
+                con.criar_tabela()
+                funcionarios = con.filtrar("acima")
+
+                pergunta = layout_input_tabela(title, funcionarios, "Deseja fazer outro filtro? ")
+                if pergunta[0].upper() == "N":
+                    break
+            except:
+                print("Erro ao conectar com o banco de dados!!!")
+        elif opcao == "2":
+            try:
+                con = ConnectionBD("empresa")
+                con.criar_tabela()
+                funcionarios = con.filtrar("abaixo")
+
+                pergunta = layout_input_tabela(title, funcionarios, "Deseja fazer outro filtro? ")
+                if pergunta[0].upper() == "N":
+                    break
+            except:
+                print("Erro ao conectar com o banco de dados!!!")
+        elif opcao == "3":
+            try:
+                con = ConnectionBD("empresa")
+                con.criar_tabela()
+                funcionarios = con.filtrar("igual")
+
+                pergunta = layout_input_tabela(title, funcionarios, "Deseja fazer outro filtro? ")
+                if pergunta[0].upper() == "N":
+                    break
+            except:
+                print("Erro ao conectar com o banco de dados!!!")

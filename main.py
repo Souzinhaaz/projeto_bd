@@ -13,6 +13,10 @@ while True:
         functions.excluir_funcionario()
     elif parametro == "4":
         functions.ordernar_registros()
+    elif parametro == "5":
+        functions.pesquisar_funcionario()
+    elif parametro == "6":
+        functions.filtrar_funcionario() 
     elif parametro == "0":
         print("Fim do programa!!!")
         break

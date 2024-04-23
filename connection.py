@@ -57,7 +57,7 @@ class ConnectionBD():
     def pesquisar_nome(self, search):
         self.conectar()
         query = f'''
-            SELECT id_matricula, nome, salario FROM funcionarios WHERE nome = ?
+            SELECT id_matricula, nome, salario FROM funcionario WHERE nome = ?
         '''
         self.cursor.execute(query, (search,))
         funcionarios = self.cursor.fetchall()
@@ -69,15 +69,15 @@ class ConnectionBD():
         self.conectar()
         if condition == "acima":
             query = '''
-                SELECT id_matricula, nome, salario FROM funcionarios WHERE salario > 1000
+                SELECT id_matricula, nome, salario FROM funcionario WHERE salario > 1000
             '''
         elif condition == "abaixo":
             query = '''
-                SELECT id_matricula, nome, salario FROM funcionarios WHERE salario < 1000
+                SELECT id_matricula, nome, salario FROM funcionario WHERE salario < 1000
             '''
         elif condition == "igual":
             query = '''
-                SELECT id_matricula, nome, salario FROM funcionarios WHERE salario == 1000
+                SELECT id_matricula, nome, salario FROM funcionario WHERE salario == 1000
             '''
         self.cursor.execute(query)
         funcionarios = self.cursor.fetchall()
